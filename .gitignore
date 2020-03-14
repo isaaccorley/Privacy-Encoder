@@ -6,3 +6,7 @@ logs/*
 models/*
 results/*
 data/*
+.vscode/*
+data/*
+models/*
+*.pyc
