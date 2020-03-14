@@ -1,0 +1,8 @@
+*.pyc
+*.jpg
+*.png
+.vscode/*
+logs/*
+models/*
+results/*
+data/*

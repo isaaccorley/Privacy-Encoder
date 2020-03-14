@@ -12,15 +12,15 @@ tf_config.gpu_options.allow_growth = True
 tf_config.log_device_placement = True
 tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=tf_config))
 
-path = "/home/icorley/innovation/AE/"
+path = "../"
 sys.path.append(path)
 
 from privacy_encoder.models import AutoEncoder
 from privacy_encoder.data import CelebA
 
 MODEL_DIR = "../models/"
-DATA_DIR = "/data/open-source/celeba/"
-IMAGE_DIR = "/data/open-source/celeba/img_align_celeba_cropped/"
+DATA_DIR = "../data/celeba/"
+IMAGE_DIR = "../data/celeba/img_align_celeba_cropped/"
 CLASSES = ["0", "1"]
 FEATURES = "Eyeglasses"
 INPUT_SHAPE = [128, 128, 3]
@@ -31,7 +31,7 @@ AUTOENCODER_WEIGHTS_PATH = None
 
 @st.cache(allow_output_mutation=True)
 def get_random_neg_class():
-    celeba = CelebA(selected_features=[FEATURES])
+    celeba = CelebA(main_folder=DATA_DIR, selected_features=[FEATURES])
     df = celeba.split("test", drop_zero=False)
     paths = df[df[FEATURES] == 0]["image_id"].tolist()
     random.shuffle(paths)
@@ -40,7 +40,7 @@ def get_random_neg_class():
 
 @st.cache(allow_output_mutation=True)
 def get_random_pos_class():
-    celeba = CelebA(selected_features=[FEATURES])
+    celeba = CelebA(main_folder=DATA_DIR, selected_features=[FEATURES])
     df = celeba.split("test", drop_zero=False)
     paths = df[df[FEATURES] == 1]["image_id"].tolist()
     random.shuffle(paths)
