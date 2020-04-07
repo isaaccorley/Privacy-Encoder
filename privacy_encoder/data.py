@@ -45,7 +45,7 @@ def two_classifier_output_datagen(generator):
 class CelebA(object):
     def __init__(
         self,
-        main_folder="/data/open-source/celeba/",
+        main_folder="./data/celeba/",
         image_folder="img_align_celeba_cropped/",
         selected_features=None,
         drop_features=[],
@@ -111,12 +111,7 @@ class CelebA(object):
         joint = partition.join(self.attributes, how="inner").drop("partition", axis=1)
 
         if drop_zero is True:
-            # select rows with all zeros values
-            return joint.loc[(joint[self.features_name] == 1).any(axis=1)]
-        elif 0 <= drop_zero <= 1:
-            zero = joint.loc[(joint[self.features_name] == 0).all(axis=1)]
-            zero = zero.sample(frac=drop_zero)
-            return joint.drop(index=zero.index)
+            return joint.loc[(joint[self.features_name] == '1').any(axis=1)]
 
         return joint
 

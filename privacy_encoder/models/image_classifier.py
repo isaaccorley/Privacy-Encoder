@@ -5,6 +5,7 @@ from .base import BaseAutoEncoder
 from .autoencoder import AutoEncoder
 
 
+
 class ImageClassifier(BaseAutoEncoder):
     def __init__(
         self,
@@ -100,4 +101,56 @@ class ImageClassifier(BaseAutoEncoder):
         )
 
         print(model.summary())
+        return model
+
+class CelebAImageClassifier(BaseAutoEncoder):
+    def __init__(
+        self,
+        input_shape=(128, 128, 3),
+        n_classes=2,
+        classifier_weights_path=None,
+        opt=keras.optimizers.Adam(lr=1e-3),
+    ):
+
+        self.input_shape = input_shape
+        self.n_channels = input_shape[-1]
+        self.n_classes = n_classes
+
+        # Build classifier
+        self.model = self.build_classifier(opt)
+
+        if classifier_weights_path is not None:
+            self.model.load_weights(classifier_weights_path)
+
+    def build_classifier(self, opt):
+        inputs = keras.layers.Input(shape=self.input_shape)
+        x = keras.layers.Conv2D(filters=32, kernel_size=(3, 3), padding="same")(inputs)
+        x = keras.layers.Activation("relu")(x)
+        x = keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
+        x = keras.layers.Conv2D(filters=32, kernel_size=(3, 3), padding="same")(x)
+        x = keras.layers.Activation("relu")(x)
+        x = keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
+        x = keras.layers.Conv2D(filters=32, kernel_size=(3, 3), padding="same")(x)
+        x = keras.layers.Activation("relu")(x)
+        x = keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
+        x = keras.layers.Flatten()(x)
+        x = keras.layers.Dense(units=32)(x)
+        x = keras.layers.Activation("relu")(x)
+        x = keras.layers.Dense(units=self.n_classes)(x)
+        outputs = keras.layers.Activation("softmax")(x)
+        model = keras.models.Model(inputs, outputs, name="Image_Classifier")
+        print(model.summary())
+
+        model.compile(
+            optimizer=opt,
+            loss="categorical_crossentropy",
+            metrics=[
+                "accuracy",
+                keras.metrics.AUC(),
+                keras.metrics.Precision(),
+                keras.metrics.Recall(),
+                tfa.metrics.F1Score(num_classes=self.n_classes),
+            ],
+        )
+
         return model

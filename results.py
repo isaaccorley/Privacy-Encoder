@@ -18,9 +18,9 @@ from privacy_encoder.data import CelebA
 MODEL_DIR = "./models/"
 DATA_DIR = "./data/celeba/"
 IMAGE_DIR = "./data/celeba/img_align_celeba_cropped/"
-RESULTS_DIR_RAW = "./output/raw"
-RESULTS_DIR_RECON = "./output/reconstructed"
-RESULTS_DIR_COMBINED = "./output/combined"
+RESULTS_DIR_RAW = "./data/output/raw"
+RESULTS_DIR_RECON = "./data/output/reconstructed"
+RESULTS_DIR_COMBINED = "./data/output/combined"
 CLASSES = ["0", "1"]
 FEATURES = "Eyeglasses"
 INPUT_SHAPE = [128, 128, 3]
