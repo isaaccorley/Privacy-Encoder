@@ -1,9 +1,7 @@
 import argparse
 from pprint import pprint
-import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix
 from mlxtend.plotting import plot_confusion_matrix
@@ -23,7 +21,7 @@ tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=tf_config))
 parser = argparse.ArgumentParser()
 parser.add_argument('--encoder_dir', type=str, default="privacy_stage1", help='Directory containing encoder weights')
 parser.add_argument('--classifier_dir', type=str, default="base", help='Directory containing classifier weights')
-parser.add_argument('--classifier_dir', type=str, default="base", help='Directory containing classifier weights')
+parser.add_argument('--classifier_type', type=str, default="base", help='Directory containing classifier weights')
 args = parser.parse_args()
 '''
 
@@ -35,7 +33,7 @@ DROP_ZERO = False
 
 ENCODER_DIR = "privacy_stage1" # args.encoder_dir
 CLASSIFIER_DIR = "base" # args.classifier_dir
-CLASSIFIER_TYPE = "image"
+CLASSIFIER_TYPE = "raw_image" # args.classifier_type
 DATA_DIR = "./data/celeba/"
 IMAGE_DIR = "img_align_celeba_cropped/"
 INPUT_SHAPE = [128, 128, 3]
@@ -96,7 +94,7 @@ test_generator = datagen.flow_from_dataframe(
 )
 
 #%% Define model
-if CLASSIFIER_TYPE == "image":
+if CLASSIFIER_TYPE in ["image", "raw_image"]:
     model = models.ImageClassifier(
         input_shape=INPUT_SHAPE,
         z_dim=Z_DIM,
@@ -136,13 +134,20 @@ print(report)
 cm = confusion_matrix(y_true, y_pred)
 
 # Plot confusion matrix
+if CLASSIFIER_TYPE == "encoding":
+    title = "Encoding"
+elif CLASSIFIER_TYPE == "image":
+    title = "Reconstructed"
+else:
+    title = "Image"
+    
 class_names = ["No Eyeglasses", "Eyeglasses"]
 fig, ax = plot_confusion_matrix(conf_mat=cm,
                                 show_absolute=True,
                                 show_normed=True,
                                 colorbar=True,
                                 class_names=class_names)
-plt.title("{} Classifier: Train Set".format(CLASSIFIER_TYPE.capitalize()))
+plt.title("{} Classifier: Train Set".format(title))
 plt.show()
 
 #%% Evaluate val set
@@ -168,7 +173,7 @@ fig, ax = plot_confusion_matrix(conf_mat=cm,
                                 show_normed=True,
                                 colorbar=True,
                                 class_names=class_names)
-plt.title("{} Classifier: Validation Set".format(CLASSIFIER_TYPE.capitalize()))
+plt.title("{} Classifier: Validation Set".format(title))
 plt.show()
 
 #%% Evaluate test set
@@ -194,5 +199,5 @@ fig, ax = plot_confusion_matrix(conf_mat=cm,
                                 show_normed=True,
                                 colorbar=True,
                                 class_names=class_names)
-plt.title("{} Classifier: Test Set".format(CLASSIFIER_TYPE.capitalize()))
+plt.title("{} Classifier: Test Set".format(title))
 plt.show()
